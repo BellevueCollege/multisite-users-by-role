@@ -85,7 +85,7 @@ class Multisite_Users_By_Role {
 
 	public function render_options_page()
 	{
-		$option = esc_attr( stripslashes( get_option( $this->option_name ) ) );
+		$option = esc_attr( stripslashes( get_site_option( $this->option_name ) ) );
 		$redirect = urlencode( remove_query_arg( 'msg', $_SERVER['REQUEST_URI'] ) );
 		$redirect = urlencode( $_SERVER['REQUEST_URI'] );
 
@@ -105,9 +105,9 @@ class Multisite_Users_By_Role {
 			<hr />
 			<br />
 			<?php 
-			if ( get_option( $this->option_name ) && is_network_admin() ) {
-				echo "<h2>All users with the role <em>'" . get_option( $this->option_name ) . "'</em></h2>";
-				echo $this->list_users_with_role( get_option( $this->option_name ) );
+			if ( get_site_option( $this->option_name ) && is_network_admin() ) {
+				echo "<h2>All users with the role <em>'" . get_site_option( $this->option_name ) . "'</em></h2>";
+				echo $this->list_users_with_role( get_site_option( $this->option_name ) );
 			} else {
 				echo '<p>Please select a role to generate this report. If a role is already selected, please click generate.</p>';
 			}
@@ -124,12 +124,12 @@ class Multisite_Users_By_Role {
 
 		if ( isset ( $_POST[ $this->option_name ] ) )
 		{
-			update_option( $this->option_name, $_POST[ $this->option_name ] );
+			update_site_option( $this->option_name, $_POST[ $this->option_name ] );
 			$msg = 'updated';
 		}
 		else
 		{
-			delete_option( $this->option_name );
+			delete_site_option( $this->option_name );
 			$msg = 'deleted';
 		}
 
