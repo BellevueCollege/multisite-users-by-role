@@ -58,6 +58,46 @@ class MUBR_User_List {
 		</table>';
 		return $output;
 	}
+
+	public function email_output( ) {
+
+		$output = '';
+		$output .= '
+		<table class="wp-list-table widefat fixed posts">
+			<thead>
+				<tr>
+					<th>Comma Separated Emails</th>
+				</tr>
+			</thead>
+			<tfoot>
+				<tr>
+					<th>Comma Separated Emails</th>
+				</tr>
+			</tfoot>
+			<tbody>';
+
+			if ( !empty( $this->users ) ) {
+
+				$email_count = count($this->users);
+				$count = 0;
+				$output .= '<tr><td>';
+				foreach( $this->users as $user ) {
+					$count++;
+					$output .= $user->email();
+					if ($count != $email_count) {
+						$output .= ', ';
+					}
+				}
+				$output .= '</td></tr>';
+			} else {
+				$output .= '<tr>
+					<td colspan="3">No Data Found</td>
+				</tr>';
+			}
+			$output .= '</tbody>
+		</table>';
+		return $output;
+	}
 	
 	private function sortUsers( $data ) {
 		usort( $data, array( $this, 'sortByLName' ) );

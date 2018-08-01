@@ -99,6 +99,8 @@ class MUBR_Admin_Interface {
 				$user_list->loadUsers();
 
 				echo $user_list->output();
+				echo '<br/>';
+				echo $user_list->email_output();
 			} else {
 				echo '<p>Please select a role to generate this report. If a role is already selected, please click generate.</p>';
 			} ?>
