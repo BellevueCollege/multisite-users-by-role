@@ -1,0 +1,19 @@
+/*
+ * Multisite Users by Role CSS
+ */
+
+.mubr-table {
+    border-collapse: collapse; 
+}
+
+.mubr-table tbody tr:nth-child(odd) {
+    background-color: #effaff;
+}
+
+.mubr-table tbody tr {
+    border-bottom: 1px solid #e1e1e1;
+}
+
+.mubr-table tbody td {
+    padding: 10px 7px;
+}

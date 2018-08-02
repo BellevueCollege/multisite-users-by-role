@@ -18,10 +18,10 @@ class MUBR_User_List {
 	}
 	
 	public function output( ) {
-
+		
 		$output = '';
 		$output .= '
-		<table class="wp-list-table widefat fixed posts">
+		<table class="mubr-table widefat fixed posts">
 			<thead>
 				<tr>
 					<th>Name</th>
@@ -63,7 +63,7 @@ class MUBR_User_List {
 
 		$output = '';
 		$output .= '
-		<table class="wp-list-table widefat fixed posts">
+		<table class="mubr-table widefat fixed posts">
 			<thead>
 				<tr>
 					<th>Comma Separated Emails</th>
