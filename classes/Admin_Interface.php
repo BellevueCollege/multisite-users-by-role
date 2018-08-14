@@ -98,8 +98,12 @@ class MUBR_Admin_Interface {
 				$user_list->setRole( get_site_option( $this->option_name ) );
 				$user_list->loadUsers();
 
+				$site_list = new MUBR_Site_List();
+				$site_list->setRole( get_site_option( $this->option_name ) );
+				$site_list->loadSites();
+
 				echo $user_list->output();
-				echo '<br/>';
+				echo $site_list->output();
 				echo $user_list->email_output();
 			} else {
 				echo '<p>Please select a role to generate this report. If a role is already selected, please click generate.</p>';

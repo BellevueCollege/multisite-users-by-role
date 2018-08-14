@@ -21,6 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 include( 'classes/Admin_Interface.php' );
 include( 'classes/User_List.php' );
+include( 'classes/Site_List.php' );
 include( 'classes/User.php' );
 include( 'classes/Site.php' );
 

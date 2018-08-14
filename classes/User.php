@@ -54,7 +54,6 @@ class MUBR_User {
 		return $output;
 	}
 	
-	
 	private function sortSites( $data ) {
 		usort( $data, array( $this, 'sortBySiteName' ) );
 		return $data;

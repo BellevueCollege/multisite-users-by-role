@@ -10,7 +10,7 @@ class MUBR_User_List {
 	protected $role;
 	
 	public function __construct() {
-		$this->users = Array();
+		$this->users = array();
 	}
 	
 	public function setRole( $role ) {
@@ -39,7 +39,6 @@ class MUBR_User_List {
 			<tbody>';
 
 			if ( !empty( $this->users ) ) {
-
 				foreach( $this->users as $row ) {
 					$output .= '<tr><td>';
 					$output .= $row->nameLF();

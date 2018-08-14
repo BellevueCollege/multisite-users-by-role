@@ -3,7 +3,8 @@
  */
 
 .mubr-table {
-    border-collapse: collapse; 
+    border-collapse: collapse;
+    margin: 1em 0;
 }
 
 .mubr-table tbody tr:nth-child(odd) {
