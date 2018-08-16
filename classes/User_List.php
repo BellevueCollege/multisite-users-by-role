@@ -7,18 +7,18 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 class MUBR_User_List {
 	//vars
 	protected $users;
-	protected $role;
+	protected $roles;
 	
 	public function __construct() {
 		$this->users = array();
+		$this->roles = array();
 	}
 	
-	public function setRole( $role ) {
-		$this->role = $role;
+	public function setRoles( $roles ) {
+		$this->roles = $roles;
 	}
 	
 	public function output( ) {
-		
 		$output = '';
 		$output .= '
 		<table class="mubr-table widefat fixed posts">
@@ -27,6 +27,7 @@ class MUBR_User_List {
 					<th>Name</th>
 					<th>Email</th>
 					<th>Sites</th>
+					<th>Role</th>
 				</tr>
 			</thead>
 			<tfoot>
@@ -34,23 +35,26 @@ class MUBR_User_List {
 					<th>Name</th>
 					<th>Email</th>
 					<th>Sites</th>
+					<th>Role</th>
 				</tr>
 			</tfoot>
 			<tbody>';
 
 			if ( !empty( $this->users ) ) {
-				foreach( $this->users as $row ) {
+				foreach( $this->users as $user ) {
 					$output .= '<tr><td>';
-					$output .= $row->nameLF();
+					$output .= $user->nameLF();
 					$output .= '</td><td>';
-					$output .= $row->email();
+					$output .= $user->email();
 					$output .= '</td><td>';
-					$output .= $row->sites();
+					$output .= $user->sites();
+					$output .= '</td><td>';
+					$output .= ucfirst($user->role());
 					$output .= '</td></tr>';
 				}
 			} else {
 				$output .= '<tr>
-					<td colspan="3">No Data Found</td>
+					<td colspan="4">No Data Found</td>
 				</tr>';
 			}
 			$output .= '</tbody>
@@ -108,7 +112,7 @@ class MUBR_User_List {
 	}
 	
 	public function loadUsers( ) {
-		if ( isset( $this->role ) ) {
+		if ( isset( $this->roles ) ) {
 			//Get array of public and private blogs
 			global $wpdb;
 			$blogs = get_sites( array(
@@ -119,23 +123,26 @@ class MUBR_User_List {
 			) );
 			foreach ( $blogs as $blog ) {
 				$blog_id = $blog->blog_id;
-				$users = get_users( array( 
-					'blog_id' => $blog_id,
-					'role'    => $this->role
-				) );
-				
-				foreach ( $users as $user ) {
-					if ( ! array_key_exists( $user->ID, $this->users ) ) {
-						$this->users[ $user->ID ] = new MUBR_User( 
-							$user->ID,
-							$user->user_email,
-							get_user_meta($user->ID, 'first_name', true),
-							get_user_meta($user->ID, 'last_name', true)
-						);
+
+				foreach ($this->roles as $role) {
+					$users = get_users( array( 
+						'blog_id' => $blog_id,
+						'role'    => $role
+					) );
+					
+					foreach ( $users as $user ) {
+						if ( ! array_key_exists( $user->ID, $this->users ) ) {
+							$this->users[ $user->ID ] = new MUBR_User( 
+								$user->ID,
+								$user->user_email,
+								get_user_meta($user->ID, 'first_name', true),
+								get_user_meta($user->ID, 'last_name', true),
+								$role
+							);
+						}
+						$this->users[ $user->ID ]->addSite( $blog_id );
 					}
-					$this->users[ $user->ID ]->addSite( $blog_id );
 				}
-				
 			}
 			$this->users = $this->sortUsers( $this->users );
 		}

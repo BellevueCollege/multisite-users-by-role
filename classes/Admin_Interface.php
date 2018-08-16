@@ -68,13 +68,13 @@ class MUBR_Admin_Interface {
 	* Display content of network options page
 	*/
 	public function render_options_page() {
-		$option = esc_attr( stripslashes( get_site_option( $this->option_name ) ) );
+		//$option = esc_attr( stripslashes( get_site_option( $this->option_name ) ) );
 		$redirect = urlencode( remove_query_arg( 'msg', $_SERVER['REQUEST_URI'] ) );
 		$redirect = urlencode( $_SERVER['REQUEST_URI'] ); ?>
 
 		<div class="wrap">
 			<h1><?php echo $GLOBALS['title']; ?></h1>
-			<p>Select a role to generate a list of all users with that role, along with the sites to which they are assigned.</p>
+			<p>Select a role or multiple roles to generate a list of all users with that role, along with the sites to which they are assigned.</p>
 
 			<div class="tablenav top">
 				<div class="alignleft actions bulkactions">
@@ -83,9 +83,10 @@ class MUBR_Admin_Interface {
 						<?php wp_nonce_field( $this->action, $this->option_name . '_nonce', FALSE ); ?>
 						<input type="hidden" name="_wp_http_referer" value="<?php echo $redirect; ?>">
 						<label for="<?php echo $this->option_name; ?>" class="screen-reader-text">Select role</label>
-						<select name="<?php echo $this->option_name; ?>" id="<?php echo $this->option_name; ?>">
-							<option value="-1">Select Role</option>
-							<?php wp_dropdown_roles( $option ); ?>
+						<select multiple="multiple" name="<?php echo $this->option_name . '[]'; ?>" id="<?php echo $this->option_name; ?>" size="8">
+							<optgroup label="Select Role">
+								<?php wp_dropdown_roles( ); ?>
+							</optgroup>
 						</select>
 						<?php submit_button( 'Create Report', 'action', 'submit', false ); ?>
 					</form>
@@ -95,11 +96,11 @@ class MUBR_Admin_Interface {
 			<?php if ( get_site_option( $this->option_name ) && is_network_admin() ) {
 
 				$user_list = new MUBR_User_List();
-				$user_list->setRole( get_site_option( $this->option_name ) );
+				$user_list->setRoles( get_site_option( $this->option_name ) );
 				$user_list->loadUsers();
 
 				$site_list = new MUBR_Site_List();
-				$site_list->setRole( get_site_option( $this->option_name ) );
+				$site_list->setRoles( get_site_option( $this->option_name ) );
 				$site_list->loadSites();
 
 				echo $user_list->output();
@@ -114,7 +115,7 @@ class MUBR_Admin_Interface {
 	public function admin_post() {
 		if ( ! wp_verify_nonce( $_POST[ $this->option_name . '_nonce' ], $this->action ) )
 			die( 'Invalid nonce.' . var_export( $_POST, true ) );
-
+			
 		if ( isset ( $_POST[ $this->option_name ] ) ) {
 			update_site_option( $this->option_name, $_POST[ $this->option_name ] );
 			$msg = 'updated';

@@ -30,12 +30,15 @@ class MUBR_Site {
 	}
 
 	public function addUser( $user ){
-		$this->users[] = new MUBR_User( 
-			$user->ID,
-			$user->user_email,
-			get_user_meta($user->ID, 'first_name', true),
-			get_user_meta($user->ID, 'last_name', true)
-		);
+		foreach ($user->roles as $role){
+			$this->users[] = new MUBR_User( 
+				$user->ID,
+				$user->user_email,
+				get_user_meta($user->ID, 'first_name', true),
+				get_user_meta($user->ID, 'last_name', true),
+				ucfirst($role)
+			);
+		}
 		$this->users = $this->sortUsers( $this->users );
 	}
 
@@ -52,6 +55,15 @@ class MUBR_Site {
 		$output = '';
 		foreach ( $this->users as $user ) {
 			$output .= $user->nameLF();
+			$output .= '<br>';
+		}
+		return $output;
+	}
+
+	public function usersRole() {
+		$output = '';
+		foreach ( $this->users as $user ) {
+			$output .= $user->role();
 			$output .= '<br>';
 		}
 		return $output;

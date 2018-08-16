@@ -12,13 +12,14 @@ class MUBR_User {
 	protected $first_name;
 	protected $last_name;
 	protected $sites;
+	protected $role;
 	
-	public function __construct( $id, $email, $first_name, $last_name ) {
+	public function __construct( $id, $email, $first_name, $last_name, $role ) {
 		$this->id = $id;
 		$this->email = $email;
 		$this->first_name = $first_name;
 		$this->last_name = $last_name;
-		
+		$this->role = $role;
 	}
 	
 	public function addSite( $site ) {
@@ -37,6 +38,9 @@ class MUBR_User {
 	}
 	public function first_name() {
 		return $this->first_name;
+	}
+	public function role() {
+		return $this->role;
 	}
 	public function nameLF() {
 		if ( $this->last_name && $this->first_name ) {

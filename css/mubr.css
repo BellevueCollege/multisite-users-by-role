@@ -18,3 +18,7 @@
 .mubr-table tbody td {
     padding: 10px 7px;
 }
+
+select#multisite_user_list_selected_role {
+    margin-bottom: 1em;
+}
