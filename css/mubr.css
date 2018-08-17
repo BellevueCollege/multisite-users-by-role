@@ -19,6 +19,11 @@
     padding: 10px 7px;
 }
 
+.mubr-table textarea {
+    width: 100%;
+    min-height: 2em;
+}
+
 select#multisite_user_list_selected_role {
     margin-bottom: 1em;
 }

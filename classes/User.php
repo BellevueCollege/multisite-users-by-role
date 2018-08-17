@@ -33,6 +33,9 @@ class MUBR_User {
 	public function email() {
 		return '<a href="mailto:' . $this->email . '">' . $this->email . '</a>';
 	}
+	public function emailOnly() {
+		return $this->email;
+	}
 	public function last_name() {
 		return $this->last_name;
 	}

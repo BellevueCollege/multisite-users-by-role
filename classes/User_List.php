@@ -81,16 +81,24 @@ class MUBR_User_List {
 
 			if ( !empty( $this->users ) ) {
 
+				$output .= '<tr><td>';
+				$output .= '<textarea onclick="this.focus(); this.select()">';
+				$emails = array();
+				foreach( $this->users as $user ) {
+					$emails[] = $user->emailOnly();
+				}
+				sort($emails);
+
 				$email_count = count($this->users);
 				$count = 0;
-				$output .= '<tr><td>';
-				foreach( $this->users as $user ) {
+				foreach ($emails as $email){
 					$count++;
-					$output .= $user->email();
+					$output .= $email;
 					if ($count != $email_count) {
 						$output .= ', ';
 					}
 				}
+				$output .= '</textarea>';
 				$output .= '</td></tr>';
 			} else {
 				$output .= '<tr>
