@@ -65,6 +65,7 @@ class MUBR_User_List {
 	public function email_output( ) {
 
 		$output = '';
+		$output .= '<h1>Comma Separated Emails</h1>';
 		$output .= '
 		<table class="mubr-table widefat fixed posts">
 			<thead>
@@ -82,7 +83,7 @@ class MUBR_User_List {
 			if ( !empty( $this->users ) ) {
 
 				$output .= '<tr><td>';
-				$output .= '<textarea onclick="this.focus(); this.select()">';
+				$output .= '<textarea id="emails-textarea">';
 				$emails = array();
 				foreach( $this->users as $user ) {
 					$emails[] = $user->emailOnly();
