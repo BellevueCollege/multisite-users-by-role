@@ -65,7 +65,6 @@ class MUBR_User_List {
 	public function email_output( ) {
 
 		$output = '';
-		$output .= '<h1>Comma Separated Emails</h1>';
 		$output .= '
 		<table class="mubr-table widefat fixed posts">
 			<thead>
@@ -103,7 +102,7 @@ class MUBR_User_List {
 				$output .= '</td></tr>';
 			} else {
 				$output .= '<tr>
-					<td colspan="3">No Data Found</td>
+					<td>No Data Found</td>
 				</tr>';
 			}
 			$output .= '</tbody>

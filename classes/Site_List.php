@@ -21,7 +21,6 @@ class MUBR_Site_List {
 	
 	public function output( ) {
 		$output = '';
-		$output .= '<h1>List All Multisite Users by Multisite</h1>';
 		$output .= '
 		<table class="mubr-table widefat fixed posts">
 			<thead>

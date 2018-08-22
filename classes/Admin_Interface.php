@@ -76,14 +76,14 @@ class MUBR_Admin_Interface {
 			<h1><?php echo $GLOBALS['title']; ?></h1>
 			<p>Select a role or multiple roles to generate a list of all users with that role, along with the sites to which they are assigned.</p>
 
-			<div class="tablenav top">
-				<div class="alignleft actions bulkactions">
+			<div class="mubr tablenav top">
+				<div class="actions bulkactions">
 					<form action="<?php echo admin_url( 'admin-post.php' ); ?>" method="POST">
 						<input type="hidden" name="action" value="<?php echo $this->action; ?>">
 						<?php wp_nonce_field( $this->action, $this->option_name . '_nonce', FALSE ); ?>
 						<input type="hidden" name="_wp_http_referer" value="<?php echo $redirect; ?>">
 						<label for="<?php echo $this->option_name; ?>" class="screen-reader-text">Select role</label>
-						<select multiple="multiple" name="<?php echo $this->option_name . '[]'; ?>" id="<?php echo $this->option_name; ?>" size="8">
+						<select multiple="multiple" name="<?php echo $this->option_name . '[]'; ?>" id="<?php echo $this->option_name; ?>" size="9">
 							<optgroup label="Select Role">
 								<?php wp_dropdown_roles( ); ?>
 							</optgroup>
@@ -93,19 +93,32 @@ class MUBR_Admin_Interface {
 				</div>
 			</div>
 
+			<?php $active_tab = isset( $_GET[ 'tab' ] ) ? $_GET[ 'tab' ] : 'sort_by_user'; ?>
+
+			<div id="mubr-nav">
+				<h2 class="nav-tab-wrapper">
+					<a href="?page=multisite_users_selected_role&tab=sort_by_user" class="nav-tab <?php echo $active_tab == 'sort_by_user' ? 'nav-tab-active' : ''; ?>">Sort By User</a>
+					<a href="?page=multisite_users_selected_role&tab=sort_by_site" class="nav-tab <?php echo $active_tab == 'sort_by_site' ? 'nav-tab-active' : ''; ?>">Sort By Site</a>
+					<a href="?page=multisite_users_selected_role&tab=emails" class="nav-tab <?php echo $active_tab == 'emails' ? 'nav-tab-active' : ''; ?>">Comma Separated Emails</a>
+				</h2>
+			</div>
+
 			<?php if ( get_site_option( $this->option_name ) && is_network_admin() ) {
 
 				$user_list = new MUBR_User_List();
 				$user_list->setRoles( get_site_option( $this->option_name ) );
 				$user_list->loadUsers();
 
-				$site_list = new MUBR_Site_List();
-				$site_list->setRoles( get_site_option( $this->option_name ) );
-				$site_list->loadSites();
-
-				echo $user_list->output();
-				echo $site_list->output();
-				echo $user_list->email_output();
+				if( $active_tab == 'sort_by_user' ) {
+					echo $user_list->output();
+				} elseif( $active_tab == 'sort_by_site' ) { 
+					$site_list = new MUBR_Site_List();
+					$site_list->setRoles( get_site_option( $this->option_name ) );
+					$site_list->loadSites();
+					echo $site_list->output();
+				} else { // 'emails'
+					echo $user_list->email_output();
+				}
 			} else {
 				echo '<p>Please select a role to generate this report. If a role is already selected, please click generate.</p>';
 			} ?>

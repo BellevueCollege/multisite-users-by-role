@@ -2,6 +2,10 @@
  * Multisite Users by Role CSS
  */
 
+.mubr.tablenav {
+    height: auto;
+}
+
 .mubr-table {
     border-collapse: collapse;
     margin: 1em 0;
@@ -25,5 +29,7 @@
 }
 
 select#multisite_user_list_selected_role {
-    margin-bottom: 1em;
+    max-width: none;
+    margin-bottom: 1em;  
+    overflow-y: auto;
 }
