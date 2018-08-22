@@ -43,18 +43,17 @@ class MUBR_Site_List {
 
 			if ( !empty( $this->users ) ) {
 				foreach( $this->sites as $site ) {	
-					$siteUsers = $site->usersEmail();
-					if ( !empty( $siteUsers ) ) {
-						$output .= '<tr><td>';
-						$output .= $site->siteLink();
-						$output .= '</td><td>';
-						$output .= $site->usersLF();
-						$output .= '</td><td>';
-						$output .= $site->usersEmail();
-						$output .= '</td><td>';
-						$output .= $site->usersRole();
-						$output .= '</td></tr>';
-					}
+					$siteUsers = $site->users();
+					
+					$output .= '<tr><td>';
+					$output .= $site->siteLink();
+					$output .= '</td><td>';
+					$output .= (!empty($siteUsers) ? $site->usersLF() : 'No Data');
+					$output .= '</td><td>';
+					$output .= (!empty($siteUsers) ? $site->usersEmail() : 'No Data');
+					$output .= '</td><td>';
+					$output .= (!empty($siteUsers) ? $site->usersRole() : 'No Data');
+					$output .= '</td></tr>';
 				}
 			} else {
 				$output .= '<tr>

@@ -29,6 +29,10 @@ class MUBR_Site {
 		return $this->name;
 	}
 
+	public function users() {
+		return $this->users;
+	}
+
 	public function addUser( $user ){
 		foreach ($user->roles as $role){
 			$this->users[] = new MUBR_User( 
