@@ -64,6 +64,28 @@ class MUBR_Admin_Interface {
 			. $this->msg_text . '</p></div>';
 	}
 	
+	/*
+	* An edit of wp_dropdown_roles() to allow remembering selections after submitting
+	*/
+
+	public function mubr_dropdown_roles( ) {
+		$r = '';
+		$editable_roles = array_reverse( get_editable_roles() );
+		$site_roles = get_site_option( $this->option_name );
+
+		foreach ( $editable_roles as $role => $details ) {
+			$name = translate_user_role($details['name'] );
+
+			$selected = '';
+			if ( is_array( $site_roles ) ) {
+				$selected = in_array( $role, $site_roles ) ? ' selected="selected"' : '';
+			}
+
+			$r .= "\n\t<option value='" . esc_attr( $role ) . "'$selected>$name</option>";
+		}
+		echo $r;
+	}
+
 	/**
 	* Display content of network options page
 	*/
@@ -85,7 +107,7 @@ class MUBR_Admin_Interface {
 						<label for="<?php echo $this->option_name; ?>" class="screen-reader-text">Select role</label>
 						<select multiple="multiple" name="<?php echo $this->option_name . '[]'; ?>" id="<?php echo $this->option_name; ?>" size="9">
 							<optgroup label="Select Role">
-								<?php wp_dropdown_roles( ); ?>
+								<?php $this->mubr_dropdown_roles( ); ?>
 							</optgroup>
 						</select>
 						<?php submit_button( 'Create Report', 'action', 'submit', false ); ?>
