@@ -65,10 +65,10 @@ class MUBR_Admin_Interface {
 	}
 	
 	/*
-	* An edit of wp_dropdown_roles() to allow remembering selections after submitting
+	* An edit of wp_dropdown_roles() for checkboxes and to allow remembering selections after submitting
 	*/
 
-	public function mubr_dropdown_roles( ) {
+	public function mubr_checkbox_roles( ) {
 		$r = '';
 		$editable_roles = array_reverse( get_editable_roles() );
 		$site_roles = get_site_option( $this->option_name );
@@ -76,12 +76,14 @@ class MUBR_Admin_Interface {
 		foreach ( $editable_roles as $role => $details ) {
 			$name = translate_user_role($details['name'] );
 
-			$selected = '';
+			$checked = '';
 			if ( is_array( $site_roles ) ) {
-				$selected = in_array( $role, $site_roles ) ? ' selected="selected"' : '';
+				$checked = in_array( $role, $site_roles ) ? ' checked="checked"' : ''; 	
 			}
-
-			$r .= "\n\t<option value='" . esc_attr( $role ) . "'$selected>$name</option>";
+			$r .="\n\t<div>";
+			$r .= "\n\t\t<input type='checkbox' id='" . esc_attr( $role ) . "' name='" . $this->option_name . "[]" . "' value='" . esc_attr( $role ) . "'$checked>";
+			$r .= "\n\t\t<label for='" . esc_attr( $role ) . "'>$name</label>";
+			$r .="\n\t</div>";
 		}
 		echo $r;
 	}
@@ -105,11 +107,10 @@ class MUBR_Admin_Interface {
 						<?php wp_nonce_field( $this->action, $this->option_name . '_nonce', FALSE ); ?>
 						<input type="hidden" name="_wp_http_referer" value="<?php echo $redirect; ?>">
 						<label for="<?php echo $this->option_name; ?>" class="screen-reader-text">Select role</label>
-						<select multiple="multiple" name="<?php echo $this->option_name . '[]'; ?>" id="<?php echo $this->option_name; ?>" size="9">
-							<optgroup label="Select Role">
-								<?php $this->mubr_dropdown_roles( ); ?>
-							</optgroup>
-						</select>
+						<fieldset name="<?php echo $this->option_name; ?>" id="<?php echo $this->option_name; ?>">
+							<legend>Select Role(s)</legend>
+							<?php $this->mubr_checkbox_roles( ); ?>
+						</fieldset>
 						<?php submit_button( 'Create Report', 'action', 'submit', false ); ?>
 					</form>
 				</div>

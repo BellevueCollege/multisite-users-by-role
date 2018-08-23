@@ -28,8 +28,13 @@
     min-height: 2em;
 }
 
-select#multisite_user_list_selected_role {
+fieldset#multisite_user_list_selected_role {
     max-width: none;
     margin-bottom: 1em;  
-    overflow-y: auto;
+}
+
+fieldset#multisite_user_list_selected_role > legend {
+    font-weight: bold;
+    padding-left: 0px;
+    margin-bottom: .5em;
 }
