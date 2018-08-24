@@ -6,6 +6,6 @@ jQuery( document ).ready( function( $ ) {
     });
 
     //resize textarea to fit content
-    $("#emails-textarea").height( $("#emails-textarea")[0].scrollHeight );
+    $("#emails-textarea").height( $("#emails-textarea").prop('scrollHeight') );
 });
 
