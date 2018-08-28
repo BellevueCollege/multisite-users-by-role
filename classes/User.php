@@ -43,7 +43,8 @@ class MUBR_User {
 		return $this->first_name;
 	}
 	public function role() {
-		return $this->role;
+		$this->role = reset($this->role);
+		return ucfirst($this->role);
 	}
 	public function nameLF() {
 		if ( $this->last_name && $this->first_name ) {

@@ -128,11 +128,10 @@ class MUBR_Admin_Interface {
 
 			<?php if ( get_site_option( $this->option_name ) && is_network_admin() ) {
 
-				$user_list = new MUBR_User_List();
-				$user_list->setRoles( get_site_option( $this->option_name ) );
-				$user_list->loadUsers();
-
 				if( $active_tab == 'sort_by_user' ) {
+					$user_list = new MUBR_User_List();
+					$user_list->setRoles( get_site_option( $this->option_name ) );
+					$user_list->loadUsers();
 					echo $user_list->output();
 				} elseif( $active_tab == 'sort_by_site' ) { 
 					$site_list = new MUBR_Site_List();
@@ -140,6 +139,9 @@ class MUBR_Admin_Interface {
 					$site_list->loadSites();
 					echo $site_list->output();
 				} else { // 'emails'
+					$user_list = new MUBR_User_List();
+					$user_list->setRoles( get_site_option( $this->option_name ) );
+					$user_list->loadUsers();
 					echo $user_list->email_output();
 				}
 			} else {

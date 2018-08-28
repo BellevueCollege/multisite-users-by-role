@@ -49,7 +49,7 @@ class MUBR_User_List {
 					$output .= '</td><td>';
 					$output .= $user->sites();
 					$output .= '</td><td>';
-					$output .= ucfirst($user->role());
+					$output .= $user->role();
 					$output .= '</td></tr>';
 				}
 			} else {
@@ -132,24 +132,22 @@ class MUBR_User_List {
 			foreach ( $blogs as $blog ) {
 				$blog_id = $blog->blog_id;
 
-				foreach ($this->roles as $role) {
-					$users = get_users( array( 
-						'blog_id' => $blog_id,
-						'role'    => $role
-					) );
-					
-					foreach ( $users as $user ) {
-						if ( ! array_key_exists( $user->ID, $this->users ) ) {
-							$this->users[ $user->ID ] = new MUBR_User( 
-								$user->ID,
-								$user->user_email,
-								get_user_meta($user->ID, 'first_name', true),
-								get_user_meta($user->ID, 'last_name', true),
-								$role
-							);
-						}
-						$this->users[ $user->ID ]->addSite( $blog_id );
+				$users = get_users( array( 
+					'blog_id' => $blog_id,
+					'role__in' => $this->roles
+				) );
+				
+				foreach ( $users as $user ) {
+					if ( ! array_key_exists( $user->ID, $this->users ) ) {
+						$this->users[ $user->ID ] = new MUBR_User( 
+							$user->ID,
+							$user->user_email,
+							get_user_meta($user->ID, 'first_name', true),
+							get_user_meta($user->ID, 'last_name', true),
+							$user->roles
+						);
 					}
+					$this->users[ $user->ID ]->addSite( $blog_id );
 				}
 			}
 			$this->users = $this->sortUsers( $this->users );
