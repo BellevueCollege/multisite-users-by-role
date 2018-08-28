@@ -12,13 +12,14 @@ class MUBR_User {
 	protected $first_name;
 	protected $last_name;
 	protected $sites;
+	protected $role;
 	
-	public function __construct( $id, $email, $first_name, $last_name ) {
+	public function __construct( $id, $email, $first_name, $last_name, $role ) {
 		$this->id = $id;
 		$this->email = $email;
 		$this->first_name = $first_name;
 		$this->last_name = $last_name;
-		
+		$this->role = $role;
 	}
 	
 	public function addSite( $site ) {
@@ -32,11 +33,18 @@ class MUBR_User {
 	public function email() {
 		return '<a href="mailto:' . $this->email . '">' . $this->email . '</a>';
 	}
+	public function emailOnly() {
+		return $this->email;
+	}
 	public function last_name() {
 		return $this->last_name;
 	}
 	public function first_name() {
 		return $this->first_name;
+	}
+	public function role() {
+		$this->role = reset($this->role);
+		return ucfirst($this->role);
 	}
 	public function nameLF() {
 		if ( $this->last_name && $this->first_name ) {
@@ -53,7 +61,6 @@ class MUBR_User {
 		}
 		return $output;
 	}
-	
 	
 	private function sortSites( $data ) {
 		usort( $data, array( $this, 'sortBySiteName' ) );

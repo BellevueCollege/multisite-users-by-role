@@ -2,16 +2,17 @@
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 /**
- * Object to store list of all users
+ * Object to store list of all sites and their users
  */
-class MUBR_User_List {
+class MUBR_Site_List {
 	//vars
-	protected $users;
+	protected $sites;
+    protected $users;
 	protected $roles;
 	
 	public function __construct() {
+        $this->sites = array();
 		$this->users = array();
-		$this->roles = array();
 	}
 	
 	public function setRoles( $roles ) {
@@ -24,32 +25,34 @@ class MUBR_User_List {
 		<table class="mubr-table widefat fixed posts">
 			<thead>
 				<tr>
+					<th>Site</th>
 					<th>Name</th>
 					<th>Email</th>
-					<th>Sites</th>
 					<th>Role</th>
 				</tr>
 			</thead>
 			<tfoot>
 				<tr>
+					<th>Site</th>
 					<th>Name</th>
 					<th>Email</th>
-					<th>Sites</th>
 					<th>Role</th>
 				</tr>
 			</tfoot>
 			<tbody>';
 
 			if ( !empty( $this->users ) ) {
-				foreach( $this->users as $user ) {
+				foreach( $this->sites as $site ) {	
+					$siteUsers = $site->users();
+					
 					$output .= '<tr><td>';
-					$output .= $user->nameLF();
+					$output .= $site->siteLink();
 					$output .= '</td><td>';
-					$output .= $user->email();
+					$output .= (!empty($siteUsers) ? $site->usersLF() : 'No Data');
 					$output .= '</td><td>';
-					$output .= $user->sites();
+					$output .= (!empty($siteUsers) ? $site->usersEmail() : 'No Data');
 					$output .= '</td><td>';
-					$output .= $user->role();
+					$output .= (!empty($siteUsers) ? $site->usersRole() : 'No Data');
 					$output .= '</td></tr>';
 				}
 			} else {
@@ -62,81 +65,37 @@ class MUBR_User_List {
 		return $output;
 	}
 
-	public function email_output( ) {
-
-		$output = '';
-		$output .= '
-		<table class="mubr-table widefat fixed posts">
-			<thead>
-				<tr>
-					<th>Comma Separated Emails</th>
-				</tr>
-			</thead>
-			<tfoot>
-				<tr>
-					<th>Comma Separated Emails</th>
-				</tr>
-			</tfoot>
-			<tbody>';
-
-			if ( !empty( $this->users ) ) {
-
-				$output .= '<tr><td>';
-				$output .= '<textarea id="emails-textarea">';
-				$emails = array();
-				foreach( $this->users as $user ) {
-					$emails[] = $user->emailOnly();
-				}
-				sort($emails);
-
-				$email_count = count($this->users);
-				$count = 0;
-				foreach ($emails as $email){
-					$count++;
-					$output .= $email;
-					if ($count != $email_count) {
-						$output .= ', ';
-					}
-				}
-				$output .= '</textarea>';
-				$output .= '</td></tr>';
-			} else {
-				$output .= '<tr>
-					<td>No Data Found</td>
-				</tr>';
-			}
-			$output .= '</tbody>
-		</table>';
-		return $output;
-	}
-	
-	private function sortUsers( $data ) {
-		usort( $data, array( $this, 'sortByLName' ) );
+	private function sortSites( $data ) {
+		usort( $data, array( $this, 'sortBySiteName' ) );
 		return $data;
 	}
 	
-	private function sortByLName( $a, $b) {
-		return strnatcmp( $a->last_name(), $b->last_name() );
+	private function sortBySiteName( $a, $b) {
+		return strnatcmp( $a->name(), $b->name() );
 	}
-	
-	public function loadUsers( ) {
+
+	public function loadSites( ) {
 		if ( isset( $this->roles ) ) {
 			//Get array of public and private blogs
 			global $wpdb;
 			$blogs = get_sites( array(
 				'number'   => 2048, // arbitrary large number
 				'archived' => 0,
-				'deleted'  => 0,
-				
-			) );
+				'deleted'  => 0,	
+            ) );
 			foreach ( $blogs as $blog ) {
 				$blog_id = $blog->blog_id;
+				$info = get_blog_details( $blog_id );
+				$this->sites[$blog_id] = new MUBR_Site(
+					$info->blogname,
+					$info->siteurl
+				);
 
 				$users = get_users( array( 
 					'blog_id' => $blog_id,
 					'role__in' => $this->roles
 				) );
-				
+
 				foreach ( $users as $user ) {
 					if ( ! array_key_exists( $user->ID, $this->users ) ) {
 						$this->users[ $user->ID ] = new MUBR_User( 
@@ -148,9 +107,10 @@ class MUBR_User_List {
 						);
 					}
 					$this->users[ $user->ID ]->addSite( $blog_id );
+					$this->sites[ $blog_id ]->addUser( $user );
 				}
-			}
-			$this->users = $this->sortUsers( $this->users );
+            }
+			$this->sites = $this->sortSites( $this->sites );
 		}
-	}
+    }
 }

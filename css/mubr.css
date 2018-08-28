@@ -1,0 +1,40 @@
+/*
+ * Multisite Users by Role CSS
+ */
+
+.mubr.tablenav {
+    height: auto;
+}
+
+.mubr-table {
+    border-collapse: collapse;
+    margin: 1em 0;
+}
+
+.mubr-table tbody tr:nth-child(odd) {
+    background-color: #effaff;
+}
+
+.mubr-table tbody tr {
+    border-bottom: 1px solid #e1e1e1;
+}
+
+.mubr-table tbody td {
+    padding: 10px 7px;
+}
+
+.mubr-table textarea {
+    width: 100%;
+    min-height: 2em;
+}
+
+fieldset#multisite_user_list_selected_role {
+    max-width: none;
+    margin-bottom: 1em;  
+}
+
+fieldset#multisite_user_list_selected_role > legend {
+    font-weight: bold;
+    padding-left: 0px;
+    margin-bottom: .5em;
+}

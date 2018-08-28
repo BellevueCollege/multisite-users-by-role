@@ -64,41 +64,86 @@ class MUBR_Admin_Interface {
 			. $this->msg_text . '</p></div>';
 	}
 	
+	/*
+	* An edit of wp_dropdown_roles() for checkboxes and to allow remembering selections after submitting
+	*/
+
+	public function mubr_checkbox_roles( ) {
+		$r = '';
+		$editable_roles = array_reverse( get_editable_roles() );
+		$site_roles = get_site_option( $this->option_name );
+
+		foreach ( $editable_roles as $role => $details ) {
+			$name = translate_user_role($details['name'] );
+
+			$checked = '';
+			if ( is_array( $site_roles ) ) {
+				$checked = in_array( $role, $site_roles ) ? ' checked="checked"' : ''; 	
+			}
+			$r .="\n\t<div>";
+			$r .= "\n\t\t<input type='checkbox' id='" . esc_attr( $role ) . "' name='" . $this->option_name . "[]" . "' value='" . esc_attr( $role ) . "'$checked>";
+			$r .= "\n\t\t<label for='" . esc_attr( $role ) . "'>$name</label>";
+			$r .="\n\t</div>";
+		}
+		echo $r;
+	}
+
 	/**
 	* Display content of network options page
 	*/
 	public function render_options_page() {
-		$option = esc_attr( stripslashes( get_site_option( $this->option_name ) ) );
+		//$option = esc_attr( stripslashes( get_site_option( $this->option_name ) ) );
 		$redirect = urlencode( remove_query_arg( 'msg', $_SERVER['REQUEST_URI'] ) );
 		$redirect = urlencode( $_SERVER['REQUEST_URI'] ); ?>
 
 		<div class="wrap">
 			<h1><?php echo $GLOBALS['title']; ?></h1>
-			<p>Select a role to generate a list of all users with that role, along with the sites to which they are assigned.</p>
+			<p>Select a role or multiple roles to generate a list of all users with that role, along with the sites to which they are assigned.</p>
 
-			<div class="tablenav top">
-				<div class="alignleft actions bulkactions">
+			<div class="mubr tablenav top">
+				<div class="actions bulkactions">
 					<form action="<?php echo admin_url( 'admin-post.php' ); ?>" method="POST">
 						<input type="hidden" name="action" value="<?php echo $this->action; ?>">
 						<?php wp_nonce_field( $this->action, $this->option_name . '_nonce', FALSE ); ?>
 						<input type="hidden" name="_wp_http_referer" value="<?php echo $redirect; ?>">
 						<label for="<?php echo $this->option_name; ?>" class="screen-reader-text">Select role</label>
-						<select name="<?php echo $this->option_name; ?>" id="<?php echo $this->option_name; ?>">
-							<option value="-1">Select Role</option>
-							<?php wp_dropdown_roles( $option ); ?>
-						</select>
+						<fieldset name="<?php echo $this->option_name; ?>" id="<?php echo $this->option_name; ?>">
+							<legend>Select Role(s)</legend>
+							<?php $this->mubr_checkbox_roles( ); ?>
+						</fieldset>
 						<?php submit_button( 'Create Report', 'action', 'submit', false ); ?>
 					</form>
 				</div>
 			</div>
 
+			<?php $active_tab = isset( $_GET[ 'tab' ] ) ? $_GET[ 'tab' ] : 'sort_by_user'; ?>
+
+			<div id="mubr-nav">
+				<h2 class="nav-tab-wrapper">
+					<a href="?page=multisite_users_selected_role&tab=sort_by_user" class="nav-tab <?php echo $active_tab == 'sort_by_user' ? 'nav-tab-active' : ''; ?>">Sort By User</a>
+					<a href="?page=multisite_users_selected_role&tab=sort_by_site" class="nav-tab <?php echo $active_tab == 'sort_by_site' ? 'nav-tab-active' : ''; ?>">Sort By Site</a>
+					<a href="?page=multisite_users_selected_role&tab=emails" class="nav-tab <?php echo $active_tab == 'emails' ? 'nav-tab-active' : ''; ?>">Comma Separated Emails</a>
+				</h2>
+			</div>
+
 			<?php if ( get_site_option( $this->option_name ) && is_network_admin() ) {
 
-				$user_list = new MUBR_User_List();
-				$user_list->setRole( get_site_option( $this->option_name ) );
-				$user_list->loadUsers();
-
-				echo $user_list->output();
+				if( $active_tab == 'sort_by_user' ) {
+					$user_list = new MUBR_User_List();
+					$user_list->setRoles( get_site_option( $this->option_name ) );
+					$user_list->loadUsers();
+					echo $user_list->output();
+				} elseif( $active_tab == 'sort_by_site' ) { 
+					$site_list = new MUBR_Site_List();
+					$site_list->setRoles( get_site_option( $this->option_name ) );
+					$site_list->loadSites();
+					echo $site_list->output();
+				} else { // 'emails'
+					$user_list = new MUBR_User_List();
+					$user_list->setRoles( get_site_option( $this->option_name ) );
+					$user_list->loadUsers();
+					echo $user_list->email_output();
+				}
 			} else {
 				echo '<p>Please select a role to generate this report. If a role is already selected, please click generate.</p>';
 			} ?>
@@ -108,7 +153,7 @@ class MUBR_Admin_Interface {
 	public function admin_post() {
 		if ( ! wp_verify_nonce( $_POST[ $this->option_name . '_nonce' ], $this->action ) )
 			die( 'Invalid nonce.' . var_export( $_POST, true ) );
-
+			
 		if ( isset ( $_POST[ $this->option_name ] ) ) {
 			update_site_option( $this->option_name, $_POST[ $this->option_name ] );
 			$msg = 'updated';
