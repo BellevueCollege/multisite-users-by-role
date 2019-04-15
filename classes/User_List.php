@@ -69,12 +69,12 @@ class MUBR_User_List {
 		<table class="mubr-table widefat fixed posts">
 			<thead>
 				<tr>
-					<th>Comma Separated Emails</th>
+					<th>Semicolon Separated Emails</th>
 				</tr>
 			</thead>
 			<tfoot>
 				<tr>
-					<th>Comma Separated Emails</th>
+					<th>Semicolon Separated Emails</th>
 				</tr>
 			</tfoot>
 			<tbody>';
@@ -95,7 +95,7 @@ class MUBR_User_List {
 					$count++;
 					$output .= $email;
 					if ($count != $email_count) {
-						$output .= ', ';
+						$output .= '; ';
 					}
 				}
 				$output .= '</textarea>';

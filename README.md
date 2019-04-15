@@ -10,7 +10,4 @@ An example of this would be to easily grab a list of all 'Administrator' users i
 3. Menu will appear under **Users** on the Network Admin Dashboard
 
 
-## Disclaimer
-This plugin is in an 'alpha' state, and still has many missing features and best practices in implimentation. Use entirely at your own risk.
-
 Pull requests are very welcome!
