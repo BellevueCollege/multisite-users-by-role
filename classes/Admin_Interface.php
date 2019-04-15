@@ -122,7 +122,7 @@ class MUBR_Admin_Interface {
 				<h2 class="nav-tab-wrapper">
 					<a href="?page=multisite_users_selected_role&tab=sort_by_user" class="nav-tab <?php echo $active_tab == 'sort_by_user' ? 'nav-tab-active' : ''; ?>">Sort By User</a>
 					<a href="?page=multisite_users_selected_role&tab=sort_by_site" class="nav-tab <?php echo $active_tab == 'sort_by_site' ? 'nav-tab-active' : ''; ?>">Sort By Site</a>
-					<a href="?page=multisite_users_selected_role&tab=emails" class="nav-tab <?php echo $active_tab == 'emails' ? 'nav-tab-active' : ''; ?>">Comma Separated Emails</a>
+					<a href="?page=multisite_users_selected_role&tab=emails" class="nav-tab <?php echo $active_tab == 'emails' ? 'nav-tab-active' : ''; ?>">Semicolon Separated Emails</a>
 				</h2>
 			</div>
 
