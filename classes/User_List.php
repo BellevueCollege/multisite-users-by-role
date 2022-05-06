@@ -109,6 +109,54 @@ class MUBR_User_List {
 		</table>';
 		return $output;
 	}
+
+	public function id_output() {
+
+		$output = '';
+		$output .= '
+		<table class="mubr-table widefat fixed posts">
+			<thead>
+				<tr>
+					<th>User IDs</th>
+				</tr>
+			</thead>
+			<tfoot>
+				<tr>
+					<th>User IDs</th>
+				</tr>
+			</tfoot>
+			<tbody>';
+
+			if ( !empty( $this->users ) ) {
+
+				$output .= '<tr><td>';
+				$output .= '<textarea id="ids-textarea">';
+				$ids = array();
+				foreach( $this->users as $user ) {
+					$ids[] = $user->id();
+				}
+				sort($ids);
+
+				$id_count = count($this->users);
+				$count = 0;
+				foreach ($ids as $id){
+					$count++;
+					$output .= $id;
+					if ($count != $id_count) {
+						$output .= ',';
+					}
+				}
+				$output .= '</textarea>';
+				$output .= '</td></tr>';
+			} else {
+				$output .= '<tr>
+					<td>No Data Found</td>
+				</tr>';
+			}
+			$output .= '</tbody>
+		</table>';
+		return $output;
+	}
 	
 	private function sortUsers( $data ) {
 		usort( $data, array( $this, 'sortByLName' ) );

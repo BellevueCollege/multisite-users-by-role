@@ -123,6 +123,7 @@ class MUBR_Admin_Interface {
 					<a href="?page=multisite_users_selected_role&tab=sort_by_user" class="nav-tab <?php echo $active_tab == 'sort_by_user' ? 'nav-tab-active' : ''; ?>">Sort By User</a>
 					<a href="?page=multisite_users_selected_role&tab=sort_by_site" class="nav-tab <?php echo $active_tab == 'sort_by_site' ? 'nav-tab-active' : ''; ?>">Sort By Site</a>
 					<a href="?page=multisite_users_selected_role&tab=emails" class="nav-tab <?php echo $active_tab == 'emails' ? 'nav-tab-active' : ''; ?>">Semicolon Separated Emails</a>
+					<a href="?page=multisite_users_selected_role&tab=ids" class="nav-tab <?php echo $active_tab == 'ids' ? 'nav-tab-active' : ''; ?>">User IDs</a>
 				</h2>
 			</div>
 
@@ -138,11 +139,16 @@ class MUBR_Admin_Interface {
 					$site_list->setRoles( get_site_option( $this->option_name ) );
 					$site_list->loadSites();
 					echo $site_list->output();
-				} else { // 'emails'
+				} elseif ( $active_tab == 'emails' ) { // 'emails'
 					$user_list = new MUBR_User_List();
 					$user_list->setRoles( get_site_option( $this->option_name ) );
 					$user_list->loadUsers();
 					echo $user_list->email_output();
+				} else {
+					$user_list = new MUBR_User_List();
+					$user_list->setRoles( get_site_option( $this->option_name ) );
+					$user_list->loadUsers();
+					echo $user_list->id_output();
 				}
 			} else {
 				echo '<p>Please select a role to generate this report. If a role is already selected, please click generate.</p>';

@@ -36,6 +36,11 @@ class MUBR_User {
 	public function emailOnly() {
 		return $this->email;
 	}
+
+	public function id() {
+		return $this->id;
+	}
+
 	public function last_name() {
 		return $this->last_name;
 	}
