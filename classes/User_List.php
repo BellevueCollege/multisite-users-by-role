@@ -109,7 +109,25 @@ class MUBR_User_List {
 		</table>';
 		return $output;
 	}
+	/**
+	 * Return an array of IDs of users with the specified role(s)
+	 */
+	public function get_ids() {
+		$ids = array();
+		foreach ( $this->users as $user ) {
+			$ids[] = $user->id();
+		}
+		sort( $ids );
+		return $ids;
+	}
 
+	/**
+	 * Return a comma separated list of IDs of users with the specified role(s)
+	 */
+	public function get_ids_csv() {
+		$ids = $this->get_ids();
+		return implode( ',', $ids );
+	}
 	public function id_output() {
 
 		$output = '';
@@ -131,21 +149,7 @@ class MUBR_User_List {
 
 				$output .= '<tr><td>';
 				$output .= '<textarea id="ids-textarea">';
-				$ids = array();
-				foreach( $this->users as $user ) {
-					$ids[] = $user->id();
-				}
-				sort($ids);
-
-				$id_count = count($this->users);
-				$count = 0;
-				foreach ($ids as $id){
-					$count++;
-					$output .= $id;
-					if ($count != $id_count) {
-						$output .= ',';
-					}
-				}
+				$output .= $this->get_ids_csv();
 				$output .= '</textarea>';
 				$output .= '</td></tr>';
 			} else {

@@ -1,3 +1,4 @@
 {
-    "phpcs.standard": "WordPress-Core,WordPress-Extra"
+    "phpcs.standard": "WordPress-Core,WordPress-Extra",
+    "phpcbf.standard": "WordPress-Core"
 }
