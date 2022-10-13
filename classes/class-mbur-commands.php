@@ -151,8 +151,8 @@ class MBUR_Commands {
 			WP_CLI::error( 'This command only works on a multisite network. Please use the --network flag.' );
 		}
 
-		// WP_CLI::log( "Keeping User IDs $users_to_keep; Deleting IDs $users_to_delete" );
-		WP_CLI::log( "Keeping User IDs $users_to_keep" );
+		WP_CLI::log( "Keeping User IDs $users_to_keep; Deleting IDs $users_to_delete" );
+		//WP_CLI::log( "Keeping User IDs $users_to_keep" );
 
 
 		// Get all the sites in the network.
@@ -194,6 +194,7 @@ class MBUR_Commands {
 
 		// Delete users from the network if --DELETE is set.
 		if ( $assoc_args['DELETE'] ) {
+			WP_CLI::log( 'Deleting users from the network...' );
 			$this->batch_delete(
 				$users_to_delete,
 				$url,
