@@ -4,7 +4,7 @@ Plugin Name: Multisite Users by Role
 Description: List all users with a certain role across a multisite network
 Plugin URI: https://github.com/BellevueCollege/multisite-users-by-role/
 Author: Taija Tevia-Clark
-Version: 2.1.0-dev1
+Version: 2.1.1
 Author URI: http://www.bellevuecollege.edu
 GitHub Plugin URI: BellevueCollege/multisite-users-by-role
 Text Domain: mubr
@@ -31,7 +31,7 @@ function MUBR_enqueue_admin_scripts() {
 	global $pagenow;
 	if ( ( 'users.php' === $pagenow ) && ( 'multisite_users_selected_role' === $_GET['page'] ) ) {
 		//checks if page is /users.php?page=multisite_users_selected_role
-		wp_enqueue_style( 'multisite_users_by_role_style', plugin_dir_url( __FILE__ ) . 'css/mubr.css', array( 'mayflower_dashboard' ), '1.0.0' );
+		wp_enqueue_style( 'multisite_users_by_role_style', plugin_dir_url( __FILE__ ) . 'css/mubr.css', array(), '1.0.0' );
 		wp_enqueue_script( 'multisite_users_by_role_script', plugin_dir_url( __FILE__ ) . 'js/mubr-script.js', array(), '1.0.0', true );
 	}
 }
