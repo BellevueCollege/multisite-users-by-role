@@ -8,14 +8,20 @@ class MUBR_User_List {
 	//vars
 	protected $users;
 	protected $roles;
+	protected $theme;
 	
 	public function __construct() {
 		$this->users = array();
 		$this->roles = array();
+		$this->theme = null;
 	}
 	
 	public function setRoles( $roles ) {
 		$this->roles = $roles;
+	}
+	
+	public function setTheme( $theme ) {
+		$this->theme = $theme;
 	}
 	
 	public function output( ) {
@@ -183,6 +189,17 @@ class MUBR_User_List {
 			) );
 			foreach ( $blogs as $blog ) {
 				$blog_id = $blog->blog_id;
+
+				// Skip sites that don't match the selected theme
+				if ( $this->theme && $this->theme !== '' ) {
+					switch_to_blog( $blog_id );
+					$current_theme = get_option( 'stylesheet' ) ?: get_option( 'template' );
+					restore_current_blog();
+					
+					if ( $current_theme !== $this->theme ) {
+						continue; // Skip this site if theme doesn't match
+					}
+				}
 
 				$users = get_users( array( 
 					'blog_id' => $blog_id,
