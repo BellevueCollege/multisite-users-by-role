@@ -9,14 +9,20 @@ class MUBR_Site_List {
 	protected $sites;
     protected $users;
 	protected $roles;
+	protected $theme;
 	
 	public function __construct() {
         $this->sites = array();
 		$this->users = array();
+		$this->theme = null;
 	}
 	
 	public function setRoles( $roles ) {
 		$this->roles = $roles;
+	}
+	
+	public function setTheme( $theme ) {
+		$this->theme = $theme;
 	}
 	
 	public function output( ) {
@@ -85,6 +91,18 @@ class MUBR_Site_List {
             ) );
 			foreach ( $blogs as $blog ) {
 				$blog_id = $blog->blog_id;
+
+				// Skip sites that don't match the selected theme
+				if ( $this->theme && $this->theme !== '' ) {
+					switch_to_blog( $blog_id );
+					$current_theme = get_option( 'stylesheet' ) ?: get_option( 'template' );
+					restore_current_blog();
+					
+					if ( $current_theme !== $this->theme ) {
+						continue; // Skip this site if theme doesn't match
+					}
+				}
+
 				$info = get_blog_details( $blog_id );
 				$this->sites[$blog_id] = new MUBR_Site(
 					$info->blogname,
