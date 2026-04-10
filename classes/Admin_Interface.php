@@ -9,9 +9,10 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
  */
 class MUBR_Admin_Interface {
 	protected static $instance = NULL;
-	protected $action          = 'gen_multisite_user_list';
-	protected $option_name     = 'multisite_user_list_selected_role';
-	protected $page_id         = NULL;
+	protected $action            = 'gen_multisite_user_list';
+	protected $option_name       = 'multisite_user_list_selected_role';
+	protected $theme_option_name = 'multisite_user_list_selected_theme';
+	protected $page_id           = NULL;
 	
 	/**
 	 * Access this plugin’s working instance
@@ -69,7 +70,6 @@ class MUBR_Admin_Interface {
 	*/
 
 	public function mubr_checkbox_roles( ) {
-		$r = '';
 		$editable_roles = array_reverse( get_editable_roles() );
 		$site_roles = get_site_option( $this->option_name );
 
@@ -80,12 +80,58 @@ class MUBR_Admin_Interface {
 			if ( is_array( $site_roles ) ) {
 				$checked = in_array( $role, $site_roles ) ? ' checked="checked"' : ''; 	
 			}
-			$r .="\n\t<div>";
-			$r .= "\n\t\t<input type='checkbox' id='" . esc_attr( $role ) . "' name='" . $this->option_name . "[]" . "' value='" . esc_attr( $role ) . "'$checked>";
-			$r .= "\n\t\t<label for='" . esc_attr( $role ) . "'>$name</label>";
-			$r .="\n\t</div>";
+			echo '<div class="mubr-checkbox-item">';
+			echo '<input type="checkbox" id="' . esc_attr( $role ) . '" name="' . $this->option_name . '[]" value="' . esc_attr( $role ) . '"' . $checked . ' aria-describedby="' . esc_attr( $role ) . '-desc">';
+			echo '<label for="' . esc_attr( $role ) . '" id="' . esc_attr( $role ) . '-desc">' . esc_html( $name ) . '</label>';
+			echo '</div>';
 		}
-		echo $r;
+	}
+
+	/*
+	* Create a dropdown of available themes across all sites
+	*/
+
+	public function mubr_theme_dropdown( ) {
+		$themes = $this->get_available_themes();
+		$selected_theme = get_site_option( $this->theme_option_name );
+
+		echo '<div class="mubr-theme-select">';
+		echo '<label for="' . esc_attr( $this->theme_option_name ) . '">' . esc_html__( 'Filter by Theme:', 'multisite-users-by-role' ) . '</label>';
+		echo '<select id="' . esc_attr( $this->theme_option_name ) . '" name="' . esc_attr( $this->theme_option_name ) . '">';
+		echo '<option value="">' . esc_html__( 'All Themes', 'multisite-users-by-role' ) . '</option>';
+		
+		foreach ( $themes as $theme ) {
+			$selected = ( $selected_theme === $theme ) ? ' selected="selected"' : '';
+			echo '<option value="' . esc_attr( $theme ) . '"' . $selected . '>' . esc_html( $theme ) . '</option>';
+		}
+		
+		echo '</select>';
+		echo '</div>';
+	}
+
+	/*
+	* Get all available themes across all sites
+	*/
+
+	private function get_available_themes( ) {
+		$themes = array();
+		$sites = get_sites( array(
+			'number'   => 2048,
+			'archived' => 0,
+			'deleted'  => 0,
+		) );
+
+		foreach ( $sites as $site ) {
+			switch_to_blog( $site->blog_id );
+			$theme = get_option( 'stylesheet' ) ?: get_option( 'template' );
+			if ( $theme && ! in_array( $theme, $themes ) ) {
+				$themes[] = $theme;
+			}
+			restore_current_blog();
+		}
+
+		sort( $themes );
+		return $themes;
 	}
 
 	/**
@@ -97,8 +143,8 @@ class MUBR_Admin_Interface {
 		$redirect = urlencode( $_SERVER['REQUEST_URI'] ); ?>
 
 		<div class="wrap">
-			<h1><?php echo $GLOBALS['title']; ?></h1>
-			<p>Select a role or multiple roles to generate a list of all users with that role, along with the sites to which they are assigned.</p>
+		<h1><?php echo $GLOBALS['title']; ?></h1>
+		<p>Select a role or multiple roles to generate a list of all users with that role, along with the sites to which they are assigned.</p>
 
 			<div class="mubr tablenav top">
 				<div class="actions bulkactions">
@@ -106,12 +152,26 @@ class MUBR_Admin_Interface {
 						<input type="hidden" name="action" value="<?php echo $this->action; ?>">
 						<?php wp_nonce_field( $this->action, $this->option_name . '_nonce', FALSE ); ?>
 						<input type="hidden" name="_wp_http_referer" value="<?php echo $redirect; ?>">
-						<label for="<?php echo $this->option_name; ?>" class="screen-reader-text">Select role</label>
-						<fieldset name="<?php echo $this->option_name; ?>" id="<?php echo $this->option_name; ?>">
-							<legend>Select Role(s)</legend>
-							<?php $this->mubr_checkbox_roles( ); ?>
-						</fieldset>
-						<?php submit_button( 'Create Report', 'action', 'submit', false ); ?>
+						
+						<div class="mubr-form-grid">
+							<div class="mubr-form-column">
+								<h3><?php esc_html_e( 'Select Role(s)', 'multisite-users-by-role' ); ?></h3>
+								<div class="mubr-checkbox-group">
+									<?php $this->mubr_checkbox_roles(); ?>
+								</div>
+							</div>
+							
+							<div class="mubr-form-column">
+								<h3><?php esc_html_e( 'Theme Filter', 'multisite-users-by-role' ); ?></h3>
+								<div class="mubr-theme-select">
+									<?php $this->mubr_theme_dropdown(); ?>
+								</div>
+							</div>
+						</div>
+						
+						<div class="mubr-form-actions">
+							<?php submit_button( 'Create Report', 'primary', 'submit', false ); ?>
+						</div>
 					</form>
 				</div>
 			</div>
@@ -128,25 +188,30 @@ class MUBR_Admin_Interface {
 			</div>
 
 			<?php if ( get_site_option( $this->option_name ) && is_network_admin() ) {
+				$selected_theme = get_site_option( $this->theme_option_name );
 
 				if( $active_tab == 'sort_by_user' ) {
 					$user_list = new MUBR_User_List();
 					$user_list->setRoles( get_site_option( $this->option_name ) );
+					$user_list->setTheme( $selected_theme );
 					$user_list->loadUsers();
 					echo $user_list->output();
 				} elseif( $active_tab == 'sort_by_site' ) { 
 					$site_list = new MUBR_Site_List();
 					$site_list->setRoles( get_site_option( $this->option_name ) );
+					$site_list->setTheme( $selected_theme );
 					$site_list->loadSites();
 					echo $site_list->output();
 				} elseif ( $active_tab == 'emails' ) { // 'emails'
 					$user_list = new MUBR_User_List();
 					$user_list->setRoles( get_site_option( $this->option_name ) );
+					$user_list->setTheme( $selected_theme );
 					$user_list->loadUsers();
 					echo $user_list->email_output();
 				} else {
 					$user_list = new MUBR_User_List();
 					$user_list->setRoles( get_site_option( $this->option_name ) );
+					$user_list->setTheme( $selected_theme );
 					$user_list->loadUsers();
 					echo $user_list->id_output();
 				}
@@ -166,6 +231,13 @@ class MUBR_Admin_Interface {
 		} else {
 			delete_site_option( $this->option_name );
 			$msg = 'deleted';
+		}
+
+		// Handle theme selection
+		if ( isset ( $_POST[ $this->theme_option_name ] ) && ! empty( $_POST[ $this->theme_option_name ] ) ) {
+			update_site_option( $this->theme_option_name, $_POST[ $this->theme_option_name ] );
+		} else {
+			delete_site_option( $this->theme_option_name );
 		}
 
 		if ( ! isset ( $_POST['_wp_http_referer'] ) )

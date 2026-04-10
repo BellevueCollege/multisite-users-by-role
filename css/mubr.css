@@ -38,3 +38,36 @@ fieldset#multisite_user_list_selected_role > legend {
     padding-left: 0px;
     margin-bottom: .5em;
 }
+
+/* Two-column layout */
+.mubr-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-bottom: 1.5rem;
+}
+
+@media (max-width: 768px) {
+    .mubr-form-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+}
+
+/* Fix WordPress form layout issues */
+.mubr-theme-select {
+    clear: both;
+    display: block;
+}
+
+.mubr-theme-select label {
+    display: block;
+    margin-bottom: 0.5em;
+    font-weight: 600;
+}
+
+.mubr-theme-select select {
+    display: block;
+    width: 100%;
+    max-width: 300px;
+}
