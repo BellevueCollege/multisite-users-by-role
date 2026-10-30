@@ -30,16 +30,16 @@ class MBUR_Commands {
 		$super_admins = get_super_admins();
 		$super_admin_ids = array();
 		foreach ( $super_admins as $super_admin ) {
-			@ $id = get_user_by( 'login', $super_admin )->ID;
-			if ( $id ) {
-				$super_admin_ids[] = $id;
+			$user = get_user_by( 'login', $super_admin );
+			if ( $user ) {
+				$super_admin_ids[] = $user->ID;
 			}
 		}
 		return $super_admin_ids;
 	}
 
 	public function super_id_list() {
-		WP_CLI::success( $this->rtn_super_admin_id() );
+		WP_CLI::success( implode( ',', $this->rtn_super_admin_id() ) );
 	}
 
 	/**
@@ -157,15 +157,17 @@ class MBUR_Commands {
 
 		// Get all the sites in the network.
 		$sites = get_sites();
+		$reassign = $assoc_args['reassign'] ?? false;
+		$batch_size = $assoc_args['batch-size'] ?? 1000;
+		$url = false;
 
 		// Delete users from each site.
 		foreach ( $sites as $site ) {
 			$url = $site->domain . $site->path;
 			//WP_CLI::log( "I would run: user delete --url=$url $reassign $users_to_delete" );
 
-			$site_batch_id;
 			switch_to_blog( $site->blog_id );
-				$site_batch_id = get_option( 'mubr_delete_users_batch_id' ,'blank!');
+			$site_batch_id = get_option( 'mubr_delete_users_batch_id' ,'blank!');
 			restore_current_blog();
 
 			if ( ! isset( $assoc_args['batch_id'] ) || $site_batch_id !== $assoc_args['batch_id'] ) {
@@ -176,8 +178,8 @@ class MBUR_Commands {
 					$users_to_delete,
 					$url,
 					false, // don't network delete
-					$assoc_args['reassign'],
-					$assoc_args['batch-size'] ?? 1000 // users in a batch
+					$reassign,
+					$batch_size
 				);
 
 				// Add Batch ID to Site Meta to allow this site to be skipped next time the command is run
@@ -193,14 +195,14 @@ class MBUR_Commands {
 		}
 
 		// Delete users from the network if --DELETE is set.
-		if ( $assoc_args['DELETE'] ) {
+		if ( $assoc_args['DELETE'] ?? false ) {
 			WP_CLI::log( 'Deleting users from the network...' );
 			$this->batch_delete(
 				$users_to_delete,
 				$url,
 				true, //network delete!
 				false,
-				$assoc_args['batch-size'] ?? 1000 // users in a batch
+				$batch_size
 			);
 		} else {
 			WP_CLI::log( 'Not network deleting users. Use --DELETE to delete users.' );
