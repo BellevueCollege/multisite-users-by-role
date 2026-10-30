@@ -35,7 +35,9 @@ class MUBR_User {
 		$this->sites = $this->sortSites( $this->sites );
 	}
 	public function email() {
-		return '<a href="mailto:' . $this->email . '">' . $this->email . '</a>';
+		$safe_email = esc_html( $this->email );
+
+		return '<a href="mailto:' . esc_attr( $this->email ) . '">' . $safe_email . '</a>';
 	}
 	public function emailOnly() {
 		return $this->email;
@@ -61,14 +63,18 @@ class MUBR_User {
 			return '';
 		}
 
-		return ucfirst( $first_role );
+		return esc_html( ucfirst( $first_role ) );
 	}
 	public function nameLF() {
+		$edit_user_link = esc_url( get_edit_user_link( $this->id ) );
+
 		if ( $this->last_name && $this->first_name ) {
-			return '<a href="' . get_edit_user_link( $this->id ) . '">' . $this->last_name . ', ' . $this->first_name . '</a>';
-		} else {
-			return '<a href="' . get_edit_user_link( $this->id ) . '">' . '<i>undefined</i>' . '</a>';
+			$display_name = esc_html( $this->last_name . ', ' . $this->first_name );
+
+			return '<a href="' . $edit_user_link . '">' . $display_name . '</a>';
 		}
+
+		return '<a href="' . $edit_user_link . '"><i>undefined</i></a>';
 	}
 	public function sites() {
 		$output = '';
