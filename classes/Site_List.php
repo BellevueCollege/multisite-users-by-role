@@ -77,7 +77,7 @@ class MUBR_Site_List {
 	}
 	
 	private function sortBySiteName( $a, $b) {
-		return strnatcmp( $a->name(), $b->name() );
+		return strnatcmp( (string) $a->name(), (string) $b->name() );
 	}
 
 	public function loadSites( ) {
@@ -104,6 +104,9 @@ class MUBR_Site_List {
 				}
 
 				$info = get_blog_details( $blog_id );
+				if ( ! $info ) {
+					continue;
+				}
 				$this->sites[$blog_id] = new MUBR_Site(
 					$info->blogname,
 					$info->siteurl

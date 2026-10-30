@@ -18,7 +18,7 @@ class MUBR_Site {
 	}
 	
 	public function siteLink() {
-		return "<a href='$this->url'>$this->name</a>";
+		return '<a href="' . esc_url( $this->url ) . '">' . esc_html( $this->name ) . '</a>';
 	}
 	
 	public function url() {
@@ -77,6 +77,6 @@ class MUBR_Site {
 	}
 	
 	private function sortByLName( $a, $b) {
-		return strnatcmp( $a->last_name(), $b->last_name() );
+		return strnatcmp( (string) $a->last_name(), (string) $b->last_name() );
 	}
 }

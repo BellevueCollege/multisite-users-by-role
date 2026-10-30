@@ -1,11 +1,19 @@
-jQuery( document ).ready( function( $ ) {
+function initializeEmailsTextarea() {
+	const emailsTextarea = document.getElementById( 'emails-textarea' );
 
-    //on textarea focus, select all
-    $('#emails-textarea').focus( function() {
-        this.select();
-    });
+	if ( ! emailsTextarea ) {
+		return;
+	}
 
-    //resize textarea to fit content
-    $("#emails-textarea").height( $("#emails-textarea").prop('scrollHeight') );
-});
+	emailsTextarea.addEventListener( 'focus', function () {
+		this.select();
+	} );
 
+	emailsTextarea.style.height = emailsTextarea.scrollHeight + 'px';
+}
+
+if ( document.readyState === 'loading' ) {
+	document.addEventListener( 'DOMContentLoaded', initializeEmailsTextarea );
+} else {
+	initializeEmailsTextarea();
+}
