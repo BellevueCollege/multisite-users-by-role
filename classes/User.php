@@ -20,10 +20,14 @@ class MUBR_User {
 		$this->first_name = $first_name;
 		$this->last_name = $last_name;
 		$this->role = $role;
+		$this->sites = array();
 	}
 	
 	public function addSite( $site ) {
 		$info = get_blog_details( $site );
+		if ( ! $info ) {
+			return;
+		}
 		$this->sites[]= new MUBR_Site(
 			$info->blogname,
 			$info->siteurl
@@ -48,8 +52,16 @@ class MUBR_User {
 		return $this->first_name;
 	}
 	public function role() {
-		$this->role = reset($this->role);
-		return ucfirst($this->role);
+		if ( ! is_array( $this->role ) || empty( $this->role ) ) {
+			return '';
+		}
+
+		$first_role = reset( $this->role );
+		if ( ! is_string( $first_role ) || $first_role === '' ) {
+			return '';
+		}
+
+		return ucfirst( $first_role );
 	}
 	public function nameLF() {
 		if ( $this->last_name && $this->first_name ) {
@@ -73,7 +85,7 @@ class MUBR_User {
 	}
 	
 	private function sortBySiteName( $a, $b) {
-		return strnatcmp( $a->name(), $b->name() );
+		return strnatcmp( (string) $a->name(), (string) $b->name() );
 	}
 	
 	

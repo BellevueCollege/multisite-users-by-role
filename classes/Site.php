@@ -77,6 +77,6 @@ class MUBR_Site {
 	}
 	
 	private function sortByLName( $a, $b) {
-		return strnatcmp( $a->last_name(), $b->last_name() );
+		return strnatcmp( (string) $a->last_name(), (string) $b->last_name() );
 	}
 }
