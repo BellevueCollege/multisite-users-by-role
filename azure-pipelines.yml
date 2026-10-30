@@ -1,0 +1,47 @@
+trigger:
+  branches:
+    include:
+      - trunk
+  tags:
+    include:
+      - 'v*'
+  paths:
+    exclude:
+      - azure-pipelines.yml
+      - azure-pipelines-release.yml
+
+pr:
+  branches:
+    include:
+      - trunk
+      - release-v*
+      - hotfix-v*
+
+resources:
+  repositories:
+    - repository: templates
+      type: github
+      name: BellevueCollege/bc-wordpress-devops-templates
+      endpoint: github-service-connection
+
+extends:
+  template: templates/ci/plugin-ci.yml@templates
+  parameters:
+
+    pluginName: 'multisite-users-by-role'
+
+    testEnvironments:
+      - name: KinstaCstage
+        displayName: 'Kinsta: CStage'
+        environment: kinsta-cstage
+        sshServiceConnection: cstage
+        variableGroup: kinsta-cstage
+
+    runComposer: false
+    runNpm: false
+    buildSteps:
+      - task: replacetokens@6
+        inputs:
+          sources: 'multisite-users-by-role.php'
+          addBOM: true
+        displayName: 'Stamp version in plugin header'

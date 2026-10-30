@@ -1,0 +1,47 @@
+trigger: none
+pr: none
+
+resources:
+  repositories:
+    - repository: templates
+      type: github
+      name: BellevueCollege/bc-wordpress-devops-templates
+      endpoint: github-service-connection
+
+  pipelines:
+    - pipeline: ci
+      source: 'multisite-users-by-role'
+      trigger:
+        branches:
+          include:
+            - 'refs/tags/v*'
+
+extends:
+  template: templates/release/plugin-release.yml@templates
+  parameters:
+
+    pluginName: 'multisite-users-by-role'
+    githubRepo: 'multisite-users-by-role'
+
+    productionEnvironments:
+      - name: KinstaProd
+        displayName: 'Kinsta: www.bellevuecollege.edu'
+        environment: kinsta-wwwbellevuecollegeedu
+        sshServiceConnection: wwwbellevuecollegeedu
+        variableGroup: kinsta-wwwbellevuecollegeedu
+      - name: KinstaStudentWeb
+        displayName: 'Kinsta: studentweb.bellevuecollege.edu'
+        environment: kinsta-studentwebbellevuecollegeedu
+        sshServiceConnection: studentwebbellevuecollegeedu
+        variableGroup: kinsta-studentwebbellevuecollegeedu
+      - name: KinstaCommons
+        displayName: 'Kinsta: commons.bellevuecollege.edu'
+        environment: kinsta-commonsbellevuecollegeedu
+        sshServiceConnection: commonsbellevuecollegeedu
+        variableGroup: kinsta-commonsbellevuecollegeedu
+      - name: FormsProdC
+        displayName: 'On Site: Forms (formsprod-c)'
+        environment: onprem-forms
+        sshServiceConnection: formsprod-c1
+        variableGroup: onprem-forms
+        agentPool: Default
