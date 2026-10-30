@@ -13,6 +13,7 @@ class MUBR_Admin_Interface {
 	protected $option_name       = 'multisite_user_list_selected_role';
 	protected $theme_option_name = 'multisite_user_list_selected_theme';
 	protected $page_id           = NULL;
+	protected $msg_text            = '';
 	
 	/**
 	 * Access this plugin’s working instance
@@ -47,8 +48,6 @@ class MUBR_Admin_Interface {
 	public function parse_message() {
 		if ( ! isset ( $_GET['msg'] ) )
 			return;
-
-		$text = FALSE;
 
 		if ( 'updated' === $_GET['msg'] )
 			$this->msg_text = 'Updated!';
@@ -138,12 +137,16 @@ class MUBR_Admin_Interface {
 	* Display content of network options page
 	*/
 	public function render_options_page() {
-		//$option = esc_attr( stripslashes( get_site_option( $this->option_name ) ) );
-		$redirect = urlencode( remove_query_arg( 'msg', $_SERVER['REQUEST_URI'] ) );
-		$redirect = urlencode( $_SERVER['REQUEST_URI'] ); ?>
+		$redirect = urlencode( wp_unslash( $_SERVER['REQUEST_URI'] ) );
+		$allowed_tabs = array( 'sort_by_user', 'sort_by_site', 'emails', 'ids' );
+		$active_tab = 'sort_by_user';
+		if ( isset( $_GET['tab'] ) && in_array( $_GET['tab'], $allowed_tabs, true ) ) {
+			$active_tab = sanitize_key( wp_unslash( $_GET['tab'] ) );
+		}
+		?>
 
 		<div class="wrap">
-		<h1><?php echo $GLOBALS['title']; ?></h1>
+		<h1><?php echo esc_html( get_admin_page_title() ); ?></h1>
 		<p>Select a role or multiple roles to generate a list of all users with that role, along with the sites to which they are assigned.</p>
 
 			<div class="mubr tablenav top">
@@ -175,8 +178,6 @@ class MUBR_Admin_Interface {
 					</form>
 				</div>
 			</div>
-
-			<?php $active_tab = isset( $_GET[ 'tab' ] ) ? $_GET[ 'tab' ] : 'sort_by_user'; ?>
 
 			<div id="mubr-nav">
 				<h2 class="nav-tab-wrapper">
@@ -222,11 +223,18 @@ class MUBR_Admin_Interface {
 	<?php }
 	
 	public function admin_post() {
-		if ( ! wp_verify_nonce( $_POST[ $this->option_name . '_nonce' ], $this->action ) )
-			die( 'Invalid nonce.' . var_export( $_POST, true ) );
-			
-		if ( isset ( $_POST[ $this->option_name ] ) ) {
-			update_site_option( $this->option_name, $_POST[ $this->option_name ] );
+		if ( ! current_user_can( 'manage_network_options' ) ) {
+			wp_die( esc_html__( 'You do not have permission to perform this action.', 'mubr' ) );
+		}
+
+		$nonce = $_POST[ $this->option_name . '_nonce' ] ?? '';
+		if ( ! wp_verify_nonce( $nonce, $this->action ) ) {
+			wp_die( esc_html__( 'Invalid security token. Please try again.', 'mubr' ) );
+		}
+
+		if ( isset ( $_POST[ $this->option_name ] ) && is_array( $_POST[ $this->option_name ] ) ) {
+			$selected_roles = array_map( 'sanitize_key', wp_unslash( $_POST[ $this->option_name ] ) );
+			update_site_option( $this->option_name, $selected_roles );
 			$msg = 'updated';
 		} else {
 			delete_site_option( $this->option_name );
@@ -235,13 +243,15 @@ class MUBR_Admin_Interface {
 
 		// Handle theme selection
 		if ( isset ( $_POST[ $this->theme_option_name ] ) && ! empty( $_POST[ $this->theme_option_name ] ) ) {
-			update_site_option( $this->theme_option_name, $_POST[ $this->theme_option_name ] );
+			$selected_theme = sanitize_text_field( wp_unslash( $_POST[ $this->theme_option_name ] ) );
+			update_site_option( $this->theme_option_name, $selected_theme );
 		} else {
 			delete_site_option( $this->theme_option_name );
 		}
 
-		if ( ! isset ( $_POST['_wp_http_referer'] ) )
-			die( 'Missing target.' );
+		if ( ! isset ( $_POST['_wp_http_referer'] ) ) {
+			wp_die( esc_html__( 'Missing redirect target.', 'mubr' ) );
+		}
 
 		$url = add_query_arg( 'msg', $msg, urldecode( $_POST['_wp_http_referer'] ) );
 
