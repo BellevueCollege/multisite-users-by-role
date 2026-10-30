@@ -27,13 +27,13 @@ require 'classes/Site.php';
 
 add_action( 'wp_loaded', array( MUBR_Admin_Interface::get_instance(), 'register' ) );
 
-function MUBR_enqueue_admin_scripts() {
-	global $pagenow;
-	if ( ( 'users.php' === $pagenow ) && ( 'multisite_users_selected_role' === $_GET['page'] ) ) {
-		//checks if page is /users.php?page=multisite_users_selected_role
-		wp_enqueue_style( 'multisite_users_by_role_style', plugin_dir_url( __FILE__ ) . 'css/mubr.css', array(), '1.0.0' );
-		wp_enqueue_script( 'multisite_users_by_role_script', plugin_dir_url( __FILE__ ) . 'js/mubr-script.js', array(), '1.0.0', true );
+function MUBR_enqueue_admin_scripts( $hook_suffix ) {
+	if ( 'users_page_multisite_users_selected_role' !== $hook_suffix ) {
+		return;
 	}
+
+	wp_enqueue_style( 'multisite_users_by_role_style', plugin_dir_url( __FILE__ ) . 'css/mubr.css', array(), '1.0.0' );
+	wp_enqueue_script( 'multisite_users_by_role_script', plugin_dir_url( __FILE__ ) . 'js/mubr-script.js', array(), '1.0.0', true );
 }
 
 add_action( 'admin_enqueue_scripts', 'MUBR_enqueue_admin_scripts' );
